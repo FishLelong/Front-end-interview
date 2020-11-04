@@ -1,13 +1,10 @@
-
 version: 2.0
 jobs:
   build:
     docker:
       - image: circleci/node:latest
-    working_directory: ~/circleci-demo-workflows
     steps:
       - checkout
-      - run: sudo npm install -g npm@6
       - run: npm install
       - save_cache:
           key: v1-dependencies-{{ checksum "package.json" }}
@@ -22,25 +19,14 @@ jobs:
             - v1-dependencies
       - add_ssh_keys:
           fingerprints:
-            - "7e:c3:0a:30:c7:06:a9:34:67:76:3a:1d:93:d9:e7:69"
+            - "39:5b:76:df:22:49:d7:1c:07:7c:a7:95:ea:d9:75:60"
       - run: echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
       - deploy:
           name: deploy
-          command: |
-            if [ "${CIRCLE_BRANCH}" = "master" ]; then
-              rsync -avce ssh build root@106.14.41.251:/root/cep
-            else
-              echo "Not master branch, dry run only"
-            fi
+          command: rsync -avce ssh build $SSH_USER@$SSH_IP:/root/cep
       - run: echo '部署完毕'
 workflows:
   version: 2
-  scheduled-workflow:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only: master
+  build-deploy:
     jobs:
-      - build
+    - build
