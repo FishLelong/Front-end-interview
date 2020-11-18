@@ -16,7 +16,7 @@ const extensions = [".js", ".svelte"];
 export default {
   input: "src/App.svelte",
   output: {
-    dir: "publiv",
+    dir: "public",
     format: "cjs",
   },
   watch: {
